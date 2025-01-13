@@ -1,0 +1,16 @@
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go module files
+/vendor/
+
+# IDE and editor-specific files
+.idea/
+.vscode/
+*.swp

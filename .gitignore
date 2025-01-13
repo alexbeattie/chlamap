@@ -1,0 +1,27 @@
+
+.codegpt
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# MacOS
+.DS_Store
+
+# Logs
+logs
+*.log
+*.log.*
+
+# Root-level node_modules (if present)
+node_modules/
+
+# Lerna/Yarn workspaces
+.pnp/
+.pnp.js
+yarn.lock
+package-lock.json
