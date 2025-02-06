@@ -1,46 +1,60 @@
-// internal/models/resource.go
 package models
 
 import (
-	"encoding/json"
-	"errors"
-	"time"
+    "errors"
+    "time"
+    "github.com/lib/pq"
 )
 
 type Resource struct {
-	ID          string          `json:"id" gorm:"primarykey"`
-	Name        string          `json:"name"`
-	Description string          `json:"description"`
-	Diagnoses   []string        `json:"diagnoses" gorm:"type:text[]"`
-	Latitude    float64         `json:"latitude"`
-	Longitude   float64         `json:"longitude"`
-	Address     string          `json:"address"`
-	ContactInfo json.RawMessage `json:"contact_info" gorm:"type:jsonb"`
-	CreatedAt   time.Time       `json:"created_at"`
-	UpdatedAt   time.Time       `json:"updated_at"`
+    ID          string    `json:"id" gorm:"type:uuid;primary_key;default:uuid_generate_v4()"`
+    Name        string    `json:"name"`
+    Description string    `json:"description"`
+    Address     string    `json:"address"`
+    Latitude    float64   `json:"latitude"`
+    Longitude   float64   `json:"longitude"`
+	Diagnoses   pq.StringArray `gorm:"type:text[]"` // Correct type for PostgreSQL array
+    CreatedAt   time.Time `json:"created_at"`
+    UpdatedAt   time.Time `json:"updated_at"`
 }
 
+type ResourceResponse struct {
+    ID          string    `json:"id"`
+    Name        string    `json:"name"`
+    Description string    `json:"description"`
+    Address     string    `json:"address"`
+    Latitude    float64   `json:"latitude"`
+    Longitude   float64   `json:"longitude"`
+	Diagnoses   []string  `json:"diagnoses"`
+    CreatedAt   time.Time `json:"created_at"`
+    UpdatedAt   time.Time `json:"updated_at"`
+}
+
+// ResourceCenter defines the spatial table for resource centers
+type ResourceCenter struct {
+	ID        string    `gorm:"type:uuid;primaryKey;default:uuid_generate_v4()"` // Use default for UUID generation
+	Name      string    `gorm:"not null"`
+	Location  string    `gorm:"type:geometry(Point,4326)"` // PostGIS Point
+	Latitude  float64   `gorm:"not null"`
+	Longitude float64   `gorm:"not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+}
+// NearbyResource extends Resource with distance information
 type NearbyResource struct {
-	Resource
-	DistanceMiles float64 `json:"distance_miles"`
-}
-
-type SearchParams struct {
-	Latitude  float64  `json:"lat"`
-	Longitude float64  `json:"lng"`
-	Radius    float64  `json:"radius"`
-	Diagnoses []string `json:"diagnoses"`
+    Resource
+    Distance float64 `json:"distance"` // Distance in meters
 }
 
 func (r *Resource) Validate() error {
-	if r.Name == "" {
-		return errors.New("name is required")
-	}
-	if r.Latitude < -90 || r.Latitude > 90 {
-		return errors.New("invalid latitude")
-	}
-	if r.Longitude < -180 || r.Longitude > 180 {
-		return errors.New("invalid longitude")
-	}
-	return nil
+    if r.Name == "" {
+        return errors.New("name is required")
+    }
+    if r.Address == "" {
+        return errors.New("address is required")
+    }
+    if r.Description == "" {
+        return errors.New("description is required")
+    }
+    return nil
 }

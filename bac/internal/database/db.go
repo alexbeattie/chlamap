@@ -34,9 +34,14 @@ func checkPostGIS(db *gorm.DB) error {
 	}
 	return nil
 }
-func RunMigrations(dsn string) error {
-    migrationPath := "file:///Users/alexbeattie/Developer/Shafali/bac/internal/database/migration"
+func RunMigrations(dsn string, migrationPath string) error {
+    // migrationPath := "file:///Users/alexbeattie/Developer/Shafali/bac/internal/database/migration"
 
+    // db, err := sql.Open("postgres", dsn)
+    // if err != nil {
+    //     return fmt.Errorf("failed to open DB for migrations: %w", err)
+    // }
+    // defer db.Close()
     db, err := sql.Open("postgres", dsn)
     if err != nil {
         return fmt.Errorf("failed to open DB for migrations: %w", err)

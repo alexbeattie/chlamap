@@ -1,9 +1,10 @@
-// internal/config/config.go
 package config
 
 import (
-	"github.com/joho/godotenv"
+	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
@@ -13,16 +14,25 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	// Load .env file
+	// Load environment variables from .env file
 	envFile := ".env.local"
 	if os.Getenv("APP_ENV") == "production" {
 		envFile = ".env.production"
 	}
-	godotenv.Load(envFile)
+
+	if err := godotenv.Load(envFile); err != nil {
+		return nil, fmt.Errorf("failed to load %s: %w", envFile, err)
+	}
+
+	// Ensure mandatory variables are present
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		return nil, fmt.Errorf("DATABASE_URL is required but not set")
+	}
 
 	return &Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		Port:        getEnvWithDefault("PORT", "8080"),
+		DatabaseURL: dbURL,
+		Port:        getEnvWithDefault("PORT", "3000"),
 		Environment: getEnvWithDefault("ENV", "development"),
 	}, nil
 }
