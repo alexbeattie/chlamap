@@ -1,5 +1,4 @@
 <!-- CustomAdvancedMarker.vue -->
-
 <template>
   <div ref="markerContainer"></div>
 </template>
@@ -40,22 +39,78 @@ export default {
 
   methods: {
     async initializeMarker() {
-      // eslint-disable-next-line
       const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
       
       const markerElement = document.createElement('div');
       markerElement.className = 'custom-marker';
       markerElement.innerHTML = `
-        <div class="marker-content" style="
-          background-color: ${this.isSelected ? '#4CAF50' : '#2196F3'};
-          width: 24px;
-          height: 24px;
-          border-radius: 50%;
-          border: 2px solid white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-          cursor: pointer;
-          transition: transform 0.2s;
-        "></div>
+        <div class="marker-content">
+          <svg 
+            width="36" 
+            height="36" 
+            viewBox="0 0 36 36" 
+            fill="none" 
+            xmlns="http://www.w3.org/2000/svg"
+            style="
+              filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+              transition: transform 0.2s;
+            "
+          >
+            <!-- Main cross background for white border effect -->
+            <path d="
+              M 15,3 
+              A 3,3 0 0 1 18,0 
+              L 21,0 
+              A 3,3 0 0 1 24,3 
+              L 24,12 
+              L 33,12 
+              A 3,3 0 0 1 36,15 
+              L 36,18 
+              A 3,3 0 0 1 33,21 
+              L 24,21 
+              L 24,30 
+              A 3,3 0 0 1 21,33 
+              L 18,33 
+              A 3,3 0 0 1 15,30 
+              L 15,21 
+              L 6,21 
+              A 3,3 0 0 1 3,18 
+              L 3,15 
+              A 3,3 0 0 1 6,12 
+              L 15,12 
+              Z
+            " 
+            fill="white"
+            />
+            <!-- Main cross foreground -->
+            <path d="
+              M 15,3 
+              A 3,3 0 0 1 18,0 
+              L 21,0 
+              A 3,3 0 0 1 24,3 
+              L 24,12 
+              L 33,12 
+              A 3,3 0 0 1 36,15 
+              L 36,18 
+              A 3,3 0 0 1 33,21 
+              L 24,21 
+              L 24,30 
+              A 3,3 0 0 1 21,33 
+              L 18,33 
+              A 3,3 0 0 1 15,30 
+              L 15,21 
+              L 6,21 
+              A 3,3 0 0 1 3,18 
+              L 3,15 
+              A 3,3 0 0 1 6,12 
+              L 15,12 
+              Z
+            " 
+            fill="${this.isSelected ? '#E11D48' : '#2196F3'}"
+            transform="scale(0.9) translate(2, 2)"
+            />
+          </svg>
+        </div>
       `;
 
       this.marker = new AdvancedMarkerElement({
@@ -74,9 +129,9 @@ export default {
   watch: {
     isSelected(newValue) {
       if (this.marker) {
-        const markerContent = this.marker.content.querySelector('.marker-content');
-        if (markerContent) {
-          markerContent.style.backgroundColor = newValue ? '#4CAF50' : '#2196F3';
+        const path = this.marker.content.querySelector('path:last-child');
+        if (path) {
+          path.setAttribute('fill', newValue ? '#E11D48' : '#2196F3');
         }
       }
     },
@@ -99,7 +154,7 @@ export default {
 .custom-marker {
   cursor: pointer;
 }
-.custom-marker:hover .marker-content {
+.custom-marker:hover svg {
   transform: scale(1.1);
 }
 </style>

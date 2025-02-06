@@ -1,6 +1,6 @@
 <!-- CustomInfoWindow.vue -->
 <template>
-  <GMapInfoWindow
+  <InfoWindow
     :position="position"
     @closeclick="$emit('closeclick')"
   >
@@ -41,13 +41,19 @@
         </button>
       </div>
     </div>
-  </GMapInfoWindow>
+  </InfoWindow>
 </template>
 
 <script>
+import { InfoWindow } from '@fawmi/vue-google-maps';
+
 export default {
   name: 'CustomInfoWindow',
   
+  components: {
+    InfoWindow
+  },
+
   props: {
     position: {
       type: Object,
@@ -58,6 +64,8 @@ export default {
       type: Object,
       required: true
     }
-  }
+  },
+
+  emits: ['closeclick', 'show-details']
 };
 </script>
