@@ -7,6 +7,8 @@ import (
 	"github.com/lib/pq"
 	"gorm.io/gorm"
 	"net/http"
+		"github.com/google/uuid"
+
 )
 
 type ResourceHandler struct {

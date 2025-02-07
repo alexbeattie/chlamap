@@ -2,7 +2,7 @@
 <template>
   <div class="h-full flex flex-col">
     <div class="p-4">
-      <h2 class="text-lg font-semibold mb-4">Hospital Resources</h2>
+      <h2 class="text-lg font-semibold mb-4">Regional Centers</h2>
       
       <!-- Search/Filter Section -->
       <div class="mb-4">

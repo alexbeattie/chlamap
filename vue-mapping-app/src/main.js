@@ -11,6 +11,7 @@ app.use(VueGoogleMaps, {
     libraries: ["places", "geometry"],
     language: "en",
     region: "US",
+    
   },
 });
 
