@@ -25,3 +25,19 @@ node_modules/
 .pnp.js
 yarn.lock
 package-lock.json
+
+# Ignore node_modules in root and all subfolders
+node_modules/
+**/node_modules/
+
+# Ignore build artifacts
+dist/
+build/
+*.log
+
+# Ignore environment files
+.env
+.env.local
+
+# Ignore OS-specific files
+.DS_Store

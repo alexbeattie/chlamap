@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type Resource struct {
 	ID          string          `json:"id" gorm:"primarykey"`
 	Name        string          `json:"name"`
 	Description string          `json:"description"`
-	Diagnoses   []string        `json:"diagnoses" gorm:"type:text[]"`
+  Diagnoses pq.StringArray `json:"diagnoses" gorm:"type:text[]"`
 	Latitude    float64         `json:"latitude"`
 	Longitude   float64         `json:"longitude"`
 	Address     string          `json:"address"`

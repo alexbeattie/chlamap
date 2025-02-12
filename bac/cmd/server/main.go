@@ -32,6 +32,8 @@ func main() {
 
 	// Initialize and start server
 	server := api.NewServer(db, cfg)
+	logger.Info("Starting server on port:", cfg.Port)
+
 	if err := server.Start(); err != nil {
 		logger.Fatal("Server failed:", err)
 	}

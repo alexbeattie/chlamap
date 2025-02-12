@@ -23,7 +23,7 @@ export default function Sidebar() {
     `}>
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className={`text-xl font-medium ${!isExpanded && 'hidden'}`}>
+          <h1 className={`text-xl text-black font-medium ${!isExpanded && 'hidden'}`}>
             Find Resources
           </h1>
           {isExpanded && (
@@ -42,17 +42,17 @@ export default function Sidebar() {
             <div className="space-y-6">
               {/* Sort Options */}
               <div>
-                <label className="text-sm text-gray-600">Sort by</label>
-                <select className="mt-1 w-full p-2 border rounded bg-white">
-                  <option>Most Active</option>
-                  <option>Distance</option>
+                <label className="text-sm text-black">Sort by</label>
+                <select className="mt-1 text-black w-full p-2 border rounded bg-white">
+                  <option>Nearest</option>
+                  <option>City</option>
                 </select>
               </div>
 
               {/* Map Settings */}
               <div>
-                <label className="text-sm text-gray-600">Map Settings</label>
-                <select className="mt-1 w-full p-2 border rounded bg-white">
+                <label className="text-sm text-black">Map Settings</label>
+                <select className="mt-1 text-black w-full p-2 border rounded bg-white">
                   <option>Road Map</option>
                   <option>Satellite</option>
                 </select>
@@ -61,7 +61,7 @@ export default function Sidebar() {
               {/* Resource Types */}
               <div>
                 <label className="text-sm text-gray-600">Resource Types</label>
-                <div className="mt-2 space-y-2">
+                <div className="mt-2 space-y-2 text-black">
                   {['ADHD', 'Autism', 'Anxiety', 'Depression'].map(type => (
                     <label key={type} className="flex items-center">
                       <input type="checkbox" className="mr-2" />

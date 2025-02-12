@@ -1,10 +1,17 @@
 // src/app/api/resources/[id]/route.js
 import { executeQuery } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { validateUUID } from '@/lib/validations'; // Create validation helpers
 
 export async function GET(request, { params }) {
   try {
     const { id } = params;
+    if (!validateUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid resource ID format' },
+        { status: 400 }
+      );
+    }
     const result = await executeQuery(
       'SELECT * FROM resources WHERE id = $1',
       [id]
@@ -29,6 +36,12 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const { id } = params;
+    if (!validateUUID(id)) {
+      return NextResponse.json(
+        { error: 'Invalid resource ID format' },
+        { status: 400 }
+      );
+    }
     const { name, description, diagnosis, latitude, longitude, address, contact_info } = await request.json();
 
     const result = await executeQuery(

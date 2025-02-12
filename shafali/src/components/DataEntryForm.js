@@ -73,6 +73,10 @@ const DataEntryForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto p-4">
+      <h2 className="text-2xl font-bold text-gray-900 text-center mb-6">
+        Add a New Resource
+      </h2>
+
       {status.message && (
         <Alert className={`mb-4 ${status.type === 'error' ? 'bg-red-50' : 'bg-green-50'}`}>
           <AlertDescription>
@@ -122,7 +126,7 @@ const DataEntryForm = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <div>
+          {/* <div>
             <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">Latitude</label>
             <input
               type="number"
@@ -133,9 +137,9 @@ const DataEntryForm = () => {
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 p-2"
             />
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">Longitude</label>
             <input
               type="number"
@@ -146,7 +150,7 @@ const DataEntryForm = () => {
               onChange={handleChange}
               className="mt-1 block w-full rounded-md border border-gray-300 p-2"
             />
-          </div>
+          </div> */}
         </div>
 
         <div>

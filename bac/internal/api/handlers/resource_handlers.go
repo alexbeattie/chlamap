@@ -1,8 +1,9 @@
-// internal/api/handlers/resource_handlers.go
 package handlers
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"bac/internal/models"
 	"github.com/gin-gonic/gin"
@@ -28,31 +29,38 @@ func (h *ResourceHandler) GetResources(c *gin.Context) {
 }
 
 func (h *ResourceHandler) SearchNearby(c *gin.Context) {
-	var params models.SearchParams
-	if err := c.ShouldBindQuery(&params); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid search parameters"})
+	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid latitude parameter"})
 		return
 	}
 
-	if params.Radius == 0 {
-		params.Radius = 5.0 // Default radius in miles
+	lng, err := strconv.ParseFloat(c.Query("lng"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid longitude parameter"})
+		return
+	}
+
+	radius, err := strconv.ParseFloat(c.DefaultQuery("radius", "5"), 64)
+	if err != nil {
+		radius = 5.0
+	}
+
+	diagnoses := []string{}
+	if diagnosesParam := c.Query("diagnoses"); diagnosesParam != "" {
+		diagnoses = strings.Split(diagnosesParam, ",")
 	}
 
 	var results []models.NearbyResource
 	query := `
-        SELECT 
-            id, name, description, address, 
-            distance_miles, diagnoses, contact_info
-        FROM find_nearby_resources($1, $2, $3, $4)
-    `
+		SELECT 
+			id, name, description, address, 
+			distance_miles, diagnoses, contact_info
+		FROM find_nearby_resources($1, $2, $3, $4)
+	`
 
-	if err := h.db.Raw(query,
-		params.Latitude,
-		params.Longitude,
-		params.Radius,
-		pq.Array(params.Diagnoses),
-	).Scan(&results).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed"})
+	if err := h.db.Raw(query, lat, lng, radius, pq.Array(diagnoses)).Scan(&results).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search nearby resources", "details": err.Error()})
 		return
 	}
 
