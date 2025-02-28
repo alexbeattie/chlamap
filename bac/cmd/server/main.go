@@ -5,6 +5,7 @@ import (
 	"bac/internal/config"
 	"bac/internal/database"
 	"bac/internal/utils"
+	"bac/internal/models"
 	"context"
 	"os"
 	"os/signal"
@@ -38,6 +39,13 @@ func main() {
 	if err != nil {
 		logger.Fatal("Failed to initialize database:", err)
 	}
+
+	// Add Auto Migration for all models
+
+	if err := db.AutoMigrate(&models.ABACenter{}); err != nil {
+    logger.Fatal("Failed to run auto-migrations:", err)
+	}
+
 
 	// Initialize server
 	server := api.NewServer(db, cfg)

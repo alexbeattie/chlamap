@@ -12,13 +12,14 @@
     "@googlemaps/markerclusterer": "^2.5.3",
     "axios": "^1.7.9",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
     "@tailwindcss/postcss": "^4.0.4",
-    "@tailwindcss/postcss7-compat": "^2.2.17",
+    "@tailwindcss/postcss7-compat": "npm:@tailwindcss/postcss7-compat",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",

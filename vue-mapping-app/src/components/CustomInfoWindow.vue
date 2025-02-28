@@ -1,58 +1,17 @@
-<!-- CustomInfoWindow.vue -->
 <template>
-  <InfoWindow
-    :position="position"
-    @closeclick="$emit('closeclick')"
-  >
-    <div class="bg-white rounded-lg shadow-lg max-w-md">
-      <div class="px-4 py-2 border-b border-gray-200">
-        <div class="flex justify-between items-center">
-          <h3 class="text-lg font-semibold text-gray-900">{{ hospital.name }}</h3>
-        </div>
-      </div>
-
-      <div class="px-4 py-2 space-y-2">
-        <div class="flex text-sm">
-          <div class="font-medium text-gray-700 min-w-24">Address:</div>
-          <div class="text-gray-900">{{ hospital.address }}</div>
-        </div>
-
-        <div class="flex text-sm" v-if="hospital.phone">
-          <div class="font-medium text-gray-700 min-w-24">Phone:</div>
-          <div class="text-gray-900">{{ hospital.phone }}</div>
-        </div>
-
-        <div class="flex text-sm" v-if="hospital.website">
-          <div class="font-medium text-gray-700 min-w-24">Website:</div>
-          <div class="text-gray-900">
-            <a :href="'https://' + hospital.website" target="_blank" class="text-blue-600 hover:underline">
-              {{ hospital.website }}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="px-4 py-2 mt-2 mb-2 flex space-x-2">
-        <button
-          @click="$emit('show-details')"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors flex-1"
-        >
-          View Details
-        </button>
-      </div>
+  <div v-if="isVisible" class="custom-info-window">
+    <div class="info-window-content">
+      <h3>{{ hospital.name }}</h3>
+      <p>{{ hospital.address }}</p>
+      <p v-if="hospital.phone">📞 {{ hospital.phone }}</p>
+      <button @click="handleClose">Close</button>
     </div>
-  </InfoWindow>
+  </div>
 </template>
 
 <script>
-import { InfoWindow } from '@fawmi/vue-google-maps';
-
 export default {
   name: 'CustomInfoWindow',
-  
-  components: {
-    InfoWindow
-  },
 
   props: {
     position: {
@@ -66,6 +25,47 @@ export default {
     }
   },
 
-  emits: ['closeclick', 'show-details']
+  data() {
+    return {
+      isVisible: true
+    };
+  },
+
+  methods: {
+    handleClose() {
+      this.isVisible = false;
+      this.$emit('closeclick');
+    }
+  }
 };
 </script>
+
+<style scoped>
+.custom-info-window {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.info-window-content {
+  text-align: left;
+}
+
+button {
+  margin-top: 8px;
+  padding: 4px 8px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+</style>

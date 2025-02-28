@@ -1,18 +1,19 @@
 <template>
   <div id="app">
-    <MapView />
+    <NavigationBar />
+    <router-view></router-view>  <!-- Use closing tag to be safe -->
   </div>
 </template>
 
 <script>
-import MapView from './components/MapView.vue';
+import NavigationBar from './components/NavigationBar.vue';
 
 export default {
-  name: 'App',
-  components: {
-    MapView, // Register the Map component
+   components: {
+    NavigationBar,
   },
-};
+  // name: 'App'
+}
 </script>
 
 <style>

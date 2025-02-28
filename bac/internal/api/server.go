@@ -26,9 +26,11 @@ func NewServer(db *gorm.DB, cfg *config.Config) *Server {
 
 	// Add CORS middleware
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Access-Control-Allow-Origin"},
+		// AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080", "http://192.168.1.158:8080", "http://alex-macbookpro.local:8080"},
+		AllowAllOrigins: true, // TEMPORARY: Allow all origins (use carefully in production)
+
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
@@ -51,9 +53,13 @@ func (s *Server) setupRoutes() {
 	resourceHandler := handlers.NewResourceHandler(s.db)
 	geoHandler := handlers.NewGeolocationHandler(s.db)
 	regionalCenterHandler := handlers.NewRegionalCenterHandler(s.db)
-
+abaCentersHandler := handlers.NewABACenterHandler(s.db)
 	api := s.router.Group("/api")
 	{
+		api.HEAD("/regional-centers", func(c *gin.Context) {
+			c.Status(http.StatusOK)
+		})
+
 		// Existing routes remain the same
 		api.GET("/resources/nearby", geoHandler.SearchNearby)
 		api.GET("/resources", resourceHandler.GetResources)
@@ -70,6 +76,13 @@ func (s *Server) setupRoutes() {
 		api.GET("/regional-centers/search", regionalCenterHandler.SearchRegionalCenters)
 		api.GET("/regional-centers/nearest", regionalCenterHandler.FindNearestCenters)
 		api.GET("/regional-centers/:id", regionalCenterHandler.GetRegionalCenterByID)
+
+		api.GET("/aba-centers", abaCentersHandler.GetABACenters)
+    api.POST("/aba-centers", abaCentersHandler.CreateABACenter)
+    api.GET("/aba-centers/search", abaCentersHandler.SearchABACenters)
+		api.GET("/aba-centers/:id", abaCentersHandler.GetABACenterByID)
+    api.PUT("/aba-centers/:id", abaCentersHandler.UpdateABACenter)
+    api.DELETE("/aba-centers/:id", abaCentersHandler.DeleteABACenter)
 
 		// Debug route
 		api.GET("/routes", func(c *gin.Context) {

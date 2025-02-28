@@ -114,27 +114,26 @@ func (h *RegionalCenterHandler) GetRegionalCenterByID(c *gin.Context) {
 // SearchRegionalCenters searches for regional centers based on query parameters
 func (h *RegionalCenterHandler) SearchRegionalCenters(c *gin.Context) {
 	var centers []models.RegionalCenter
-	query := h.DB
+	var totalCount int64
 
-	// Filter by county if provided
+	var regionalCenter models.RegionalCenter
+	query := h.DB.Model(&regionalCenter)
+
+	// Apply filters
 	if county := c.Query("county"); county != "" {
 		query = query.Where("county_served ILIKE ?", "%"+county+"%")
 	}
-
-	// Filter by health district if provided
 	if district := c.Query("district"); district != "" {
 		query = query.Where("los_angeles_health_district ILIKE ?", "%"+district+"%")
 	}
-
-	// Filter by office type if provided
 	if officeType := c.Query("office_type"); officeType != "" {
 		query = query.Where("office_type = ?", officeType)
 	}
-
-	// Filter by city if provided
 	if city := c.Query("city"); city != "" {
 		query = query.Where("city ILIKE ?", "%"+city+"%")
 	}
+	query.Count(&totalCount)
+
 
 	// Add pagination logic
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))       // Default to page 1
@@ -174,24 +173,17 @@ func (h *RegionalCenterHandler) FindNearestCenters(c *gin.Context) {
         Distance float64 `json:"distance"`
     }
 
-    query := `
-        SELECT id, regional_center AS name, 
-               ST_Distance(
-                   location,
-                   ST_SetSRID(ST_MakePoint($1, $2), 4326)
-               ) AS distance
-        FROM regional_centers
-        WHERE location IS NOT NULL
-          AND ST_DWithin(
-              location,
-              ST_SetSRID(ST_MakePoint($1, $2), 4326),
-              $3
-          )
-        ORDER BY distance
-        LIMIT 5;
-    `
+    	query := `
+		SELECT id, regional_center AS name, 
+		       ST_Y(location) AS latitude, ST_X(location) AS longitude,
+		       address || ', ' || COALESCE(suite, '') || ', ' || city || ', ' || state || ' ' || zip_code AS address,
+		       telephone AS phone, website, office_type AS type
+		FROM regional_centers
+		WHERE location IS NOT NULL
+	`
 
-    if err := h.DB.Raw(query, lng, lat, distance).Scan(&centers).Error; err != nil {
+
+if err := h.DB.Raw(query, lat, lng, distance).Scan(&centers).Error; err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to find nearest centers"})
         return
     }
