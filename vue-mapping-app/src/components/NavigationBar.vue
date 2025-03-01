@@ -5,10 +5,10 @@
     </div>
     <div class="navbar-menu">
       <div class="navbar-start">
-        <router-link to="/" class="navbar-item">Home</router-link>
-        <router-link to="/aba-centers" class="navbar-item"
-          >ABA Centers</router-link
-        >
+        <router-link to="/">Home</router-link>
+        <router-link to="/aba-centers">ABA Centers</router-link>
+        <router-link to="/providers">Providers Map</router-link>
+        <!-- ✅ Add this link -->
       </div>
     </div>
   </nav>

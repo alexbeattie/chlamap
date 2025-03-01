@@ -175,7 +175,8 @@ export default defineComponent({
 
     async fetchResources() {
       try {
-        const { data } = await apiClient.get("/api/regional-centers");
+        console.log("Fetching resources from:", apiClient.defaults.baseURL + "/regional-centers");
+        const { data } = await apiClient.get("/regional-centers");
         console.log("Raw resources data:", data);
 
         this.resources = (Array.isArray(data) ? data : []).map((resource) => ({

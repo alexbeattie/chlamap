@@ -11,6 +11,10 @@ type Config struct {
 	DatabaseURL string
 	Port        string
 	Environment string
+	ServerPort  int
+	JWTSecret   string
+	FrontendURL string
+	
 }
 
 func Load() (*Config, error) {

@@ -2,7 +2,7 @@ package api
 
 import (
 	"bac/internal/api/handlers"
-
+	authMiddleware "bac/internal/api/middleware/auth" // Import with alias
 	"bac/internal/config"
 	"context"
 	"fmt"
@@ -11,14 +11,23 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	
 	"gorm.io/gorm"
 )
-
 type Server struct {
 	router *gin.Engine
 	db     *gorm.DB
 	config *config.Config
 	server *http.Server
+	middleware struct {
+		AuthMiddleware    gin.HandlerFunc
+		RequirePermission func(string) gin.HandlerFunc
+  }
+}
+
+type Logger interface {
+    Error(message string, args ...interface{})
+    // Other methods as needed
 }
 
 func NewServer(db *gorm.DB, cfg *config.Config) *Server {
@@ -26,8 +35,8 @@ func NewServer(db *gorm.DB, cfg *config.Config) *Server {
 
 	// Add CORS middleware
 	router.Use(cors.New(cors.Config{
-		// AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080", "http://192.168.1.158:8080", "http://alex-macbookpro.local:8080"},
-		AllowAllOrigins: true, // TEMPORARY: Allow all origins (use carefully in production)
+		AllowOrigins: []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8081", "http://localhost:8080", "http://192.168.1.158:8080", "http://alex-macbookpro.local:8080"},
+		// AllowAllOrigins: true, // TEMPORARY: Allow all origins (use carefully in production)
 
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
@@ -40,20 +49,28 @@ func NewServer(db *gorm.DB, cfg *config.Config) *Server {
 		db:     db,
 		config: cfg,
 		server: &http.Server{
-			Addr:    ":" + cfg.Port, // Use cfg.Port instead of cfg.Server
+			Addr:    ":" + cfg.Port,
 			Handler: router,
 		},
 	}
-
+	
+	// Initialize middleware
+	server.middleware.AuthMiddleware = authMiddleware.AuthMiddleware([]byte(cfg.JWTSecret))
+	server.middleware.RequirePermission = authMiddleware.RequirePermission
+		
+	// Register routes
+	server.RegisterAuthRoutes()
 	server.setupRoutes()
 	return server
 }
 
+// Rest of the file stays the same
 func (s *Server) setupRoutes() {
 	resourceHandler := handlers.NewResourceHandler(s.db)
 	geoHandler := handlers.NewGeolocationHandler(s.db)
 	regionalCenterHandler := handlers.NewRegionalCenterHandler(s.db)
-abaCentersHandler := handlers.NewABACenterHandler(s.db)
+	abaCentersHandler := handlers.NewABACenterHandler(s.db)
+	providersHandler := handlers.NewProvidersHandler(s.db)
 	api := s.router.Group("/api")
 	{
 		api.HEAD("/regional-centers", func(c *gin.Context) {
@@ -78,11 +95,13 @@ abaCentersHandler := handlers.NewABACenterHandler(s.db)
 		api.GET("/regional-centers/:id", regionalCenterHandler.GetRegionalCenterByID)
 
 		api.GET("/aba-centers", abaCentersHandler.GetABACenters)
-    api.POST("/aba-centers", abaCentersHandler.CreateABACenter)
-    api.GET("/aba-centers/search", abaCentersHandler.SearchABACenters)
+		api.POST("/aba-centers", abaCentersHandler.CreateABACenter)
+		api.GET("/aba-centers/search", abaCentersHandler.SearchABACenters)
 		api.GET("/aba-centers/:id", abaCentersHandler.GetABACenterByID)
-    api.PUT("/aba-centers/:id", abaCentersHandler.UpdateABACenter)
-    api.DELETE("/aba-centers/:id", abaCentersHandler.DeleteABACenter)
+		api.PUT("/aba-centers/:id", abaCentersHandler.UpdateABACenter)
+		api.DELETE("/aba-centers/:id", abaCentersHandler.DeleteABACenter)
+
+		api.GET("/providers", providersHandler.GetProviders)
 
 		// Debug route
 		api.GET("/routes", func(c *gin.Context) {
@@ -94,7 +113,10 @@ abaCentersHandler := handlers.NewABACenterHandler(s.db)
 		})
 	}
 }
+
 func (s *Server) Start() error {
+		fmt.Println("Server running on port:", s.server.Addr)
+
 	return s.server.ListenAndServe()
 }
 
